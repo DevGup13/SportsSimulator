@@ -1,0 +1,55 @@
+
+name: Sports Simulator Website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sports-simulator-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Get website files
+        uses: actions/checkout@v4
+
+      - name: Update ESPN fixtures
+        continue-on-error: true
+        run: python GITHUB_PAGES_PACKAGE/tools/refresh.py
+
+      - name: Save updated fixtures
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add GITHUB_PAGES_PACKAGE/site/live-fixtures/data.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Sports Simulator fixtures"
+            git push
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: GITHUB_PAGES_PACKAGE/site
+
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4
