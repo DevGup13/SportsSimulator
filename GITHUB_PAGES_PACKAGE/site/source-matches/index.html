@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | Cross-Source Evidence</title>
+<style>
+body{background:#292b29;color:#f5f6f1;font:15px system-ui;margin:0}
+main{max-width:950px;margin:auto;padding:24px}
+h1{color:#baff70}a{color:#8de9f0}
+.card{background:#373e37;padding:12px;margin:9px 0;border-radius:11px}
+small{color:#cad2c5}
+</style>
+<main>
+<a href="../">← Sports Simulator</a>
+<h1>🏆 Cross-Source Match Evidence</h1>
+<p>Source-backed identity evidence, not calibrated forecasts.
+This is a dated snapshot rather than an automatically refreshing feed.</p>
+<p id="summary"></p>
+<div id="games"></div>
+<script>
+fetch('./data.json')
+.then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()})
+.then(d=>{
+ document.getElementById('summary').textContent=
+ d.matching_completed_events+' matched historical results · '+
+ d.corroborated_team_ids+' corroborated IDs · '+
+ d.fully_corrob_pairs+'/'+d.upcoming+
+ ' fully corroborated upcoming fixtures';
+ const root=document.getElementById('games');
+ for(const x of d.fixture_rows){
+  let c=document.createElement('div');c.className='card';
+  let h=document.createElement('strong');
+  h.textContent=x.home+' vs '+x.away;
+  let p=document.createElement('p');
+  p.textContent=x.league+' · '+
+    new Date(x.kickoff_utc).toLocaleString();
+  let t=document.createElement('small');
+  t.textContent=(x.both_history_corrob?
+    'Both teams corroborated':'Identity evidence incomplete')+
+    ' · Forecast unavailable';
+  c.append(h,p,t);root.append(c);
+ }
+})
+.catch(e=>document.getElementById('summary').textContent=e.message);
+</script>
+</main></html>

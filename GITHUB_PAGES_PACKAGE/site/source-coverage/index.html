@@ -1,0 +1,34 @@
+<!doctype html><html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator · Source Coverage</title>
+<style>
+body{margin:0;background:#292b29;color:#f3f5ee;font:15px system-ui}
+main{max-width:900px;margin:auto;padding:22px}
+h1{color:#baff70}a{color:#8ee8ef}
+.card{background:#393e38;border-radius:9px;padding:13px;margin:10px 0}
+</style><main>
+<a href="../">← Beta</a>
+<h1>🌍 Multi-Source Data Coverage</h1>
+<p>Independent historical football sources. Team-name matches
+are review candidates, not certified ESPN ID joins.</p>
+<p id="summary">Loading...</p>
+<div id="rows"></div>
+<script>
+fetch('./data.json')
+.then(r=>{if(!r.ok)throw Error(r.status);return r.json()})
+.then(d=>{
+ document.getElementById('summary').textContent=
+ d.new_source_records+' imported historical results · '+
+ (d.fixture_counts.LEAGUE_NAME_HISTORY_CANDIDATE||0)+
+ ' fixture history candidates';
+ const root=document.getElementById('rows');
+ for(const [k,v] of Object.entries(d.football_data)){
+  const c=document.createElement('div');
+  c.className='card';
+  c.textContent=k+' · '+v.status+' · '+(v.records||0)+' rows';
+  root.append(c);
+ }
+})
+.catch(e=>document.getElementById('summary').textContent=e.message);
+</script></main></html>

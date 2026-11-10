@@ -1,0 +1,45 @@
+<!doctype html><html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator — Research Forecasts</title>
+<style>
+body{margin:0;background:#292b29;color:#f6f6f1;font:15px system-ui}
+main{max-width:980px;margin:auto;padding:24px}
+h1{color:#baff70}a{color:#90e8f1}
+.card{background:#383c37;padding:14px;margin:9px 0;border-radius:11px}
+.bar{display:flex;height:14px;overflow:hidden;border-radius:8px;background:#555}
+.bar span:nth-child(1){background:#91dcff}
+.bar span:nth-child(2){background:#d8d6df}
+.bar span:nth-child(3){background:#d7bdff}
+.warn{border-left:3px solid #baff70;padding:12px;background:#394238}
+</style>
+<main><a href="../">← Beta</a>
+<h1>⚽ 1M-Draw Research Forecasts</h1>
+<p class="warn">EXPERIMENTAL — not calibrated for live betting. Each listed fixture has 1,000,000 new Poisson draws. Corners, cards, player props and event replay unavailable.</p>
+<p id="expiry-warning"></p><p id="summary"></p><div id="games"></div>
+<script>
+const $=x=>document.getElementById(x);
+fetch('./data.json')
+.then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()})
+.then(d=>{
+ $('expiry-warning').textContent=d.fixtures.filter(x=>new Date(x.kickoff_utc)<=new Date()).length+' forecasts have kicked off and are archived, not current recommendations. Snapshot generated '+d.generated_utc+'.';$('summary').textContent=d.eligible_simulated_fixtures+
+ ' eligible fixtures · '+d.experimental_new_draws.toLocaleString()+' experimental draws';
+ for(const x of d.fixtures){
+  let box=document.createElement('div');box.className='card';
+  let h=document.createElement('h3');h.textContent=x.home+' vs '+x.away;
+  let p=document.createElement('p');
+  p.textContent=x.league+' · '+new Date(x.kickoff_utc).toLocaleString()+
+  ' · 1,000,000 simulations · xG '+x.xg_home+' / '+x.xg_away;
+  let b=document.createElement('div');b.className='bar';
+  for(const v of [x.markets.home_win,x.markets.draw,x.markets.away_win]){
+   let s=document.createElement('span');s.style.width=(100*v).toFixed(2)+'%';b.append(s)
+  }
+  let t=document.createElement('p');
+  t.textContent='1X2 '+[x.markets.home_win,x.markets.draw,x.markets.away_win]
+   .map(v=>(100*v).toFixed(1)+'%').join(' / ')+
+   ' · BTTS '+(100*x.markets.btts_yes).toFixed(1)+'%'+
+   ' · O2.5 '+(100*x.markets.over_2_5).toFixed(1)+'%';
+  box.append(h,p,b,t);$('games').append(box)
+ }
+})
+.catch(e=>$('summary').textContent=e.message);
+</script></main></html>

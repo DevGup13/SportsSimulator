@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | ID Evidence</title>
+<style>
+body{background:#292b29;color:#fafaf5;font:15px system-ui;margin:0}
+main{max-width:920px;margin:auto;padding:22px}
+a{color:#90eafa}h1{color:#baff70}
+.card{background:#393e38;border:1px solid #556050;
+border-radius:10px;padding:12px;margin:8px 0}
+</style>
+<main>
+<a href="../">← Beta</a>
+<h1>🧬 Source-ID Evidence</h1>
+<p>Provider IDs corroborated against ESPN-tagged history and exact names.
+No forecast certification, simulation, or additional identity approval.</p>
+<p id="count">Loading...</p><div id="cards"></div>
+<script>
+fetch('./data.json')
+.then(r=>{if(!r.ok)throw Error(r.status);return r.json()})
+.then(d=>{
+ document.getElementById('count').textContent=
+ d.corroborated_identity_pairs+' / '+d.records.length+' corroborated pairs';
+ let root=document.getElementById('cards');
+ for(let x of d.records){
+  let c=document.createElement('div');c.className='card';
+  let h=document.createElement('strong');
+  h.textContent=x.home+' vs '+x.away;
+  let p=document.createElement('p');
+  p.textContent=x.identity_status+' · '+
+   (x.reasons.join(', ')||'No identity issues detected');
+  c.append(h,p);root.append(c);
+ }
+})
+.catch(e=>document.getElementById('count').textContent=e.message);
+</script></main></html>

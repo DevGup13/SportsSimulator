@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | Beta Launch</title>
+<style>
+:root{color-scheme:dark;--bg:#292b29;--surface:#383b37;
+--line:#575c54;--lime:#b9fb70;--cyan:#83e8ed;
+--text:#f6f6f0;--sub:#c5c9c0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:14px system-ui,-apple-system,Arial,sans-serif}
+main{max-width:1220px;margin:auto;padding:25px 19px 70px}
+h1{font-size:clamp(32px,5vw,52px);line-height:1.04;margin:8px 0}
+h2{font-size:23px}h3{font-size:16px;margin:8px 0}
+a{color:var(--cyan)}
+small,.muted{color:var(--sub)}
+.kicker{color:var(--lime);font-size:11px;font-weight:850;
+letter-spacing:2px}
+.header{display:flex;justify-content:space-between;
+align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-weight:900;font-size:18px}
+.mini{font-size:12px;color:var(--sub)}
+.notice{border-left:3px solid var(--lime);background:#333a31;
+border-radius:8px;padding:14px;margin:19px 0;line-height:1.6}
+.metrics{display:grid;grid-template-columns:
+repeat(auto-fit,minmax(145px,1fr));gap:11px;margin:23px 0}
+.metric,.card,.detail{background:var(--surface);
+border:1px solid var(--line);border-radius:15px;padding:17px}
+.metric strong{display:block;color:var(--lime);font-size:25px}
+.tabs,.controls{display:flex;flex-wrap:wrap;gap:9px;margin:17px 0}
+button,input,select{border:1px solid var(--line);border-radius:10px;
+background:#2c302b;color:var(--text);font:inherit;padding:11px 13px}
+button{cursor:pointer}
+button.active{background:var(--lime);color:#162015;
+font-weight:850;border-color:var(--lime)}
+input{flex:2;min-width:180px}
+select{flex:1;min-width:135px}
+.cards{display:grid;grid-template-columns:
+repeat(auto-fill,minmax(246px,1fr));gap:12px}
+.card{min-height:139px;display:flex;flex-direction:column;gap:7px}
+.card button{align-self:flex-start;margin-top:auto}
+.tag{color:var(--lime);font-size:10px;font-weight:850;
+letter-spacing:1px;overflow-wrap:anywhere}
+.detail{margin:18px 0}
+.graph{margin:12px 0}
+.glabel{display:flex;justify-content:space-between;margin:5px 0}
+.track{height:12px;border-radius:30px;background:#555c52;overflow:hidden}
+.fill{height:100%;background:var(--lime)}
+.secondary{background:#323833;border-radius:10px;padding:12px}
+.checkpass{color:var(--lime)}
+.checkfail{color:#ffb3a8}
+.hidden{display:none!important}
+footer{margin-top:35px;border-top:1px solid var(--line);
+padding-top:18px;color:var(--sub)}
+@media(max-width:500px){
+main{padding:17px 12px 50px}
+.card{min-height:125px}.metric strong{font-size:21px}
+}
+</style></head><body><main>
+<header class="header">
+<div class="brand">⚽ SPORTS SIMULATOR <small>BETA</small></div>
+<div class="mini" id="built">Local release preview</div>
+</header><div style="padding:12px"><a href="./release-readiness/">🏆 Release Evidence</a></div><div style="padding:12px"><a href="./research-forecasts/">🎲 1M Research Forecasts</a></div><div style="padding:12px"><a href="./source-matches/">🏆 Cross-Source Evidence</a></div><div style="padding:12px"><a href="./model-evidence/">🏆 Model Evidence</a></div><div style="padding:12px"><a href="./source-coverage/">🌍 Source Coverage</a></div><div style="padding:12px"><a href="./core-four-readiness/">🏆 Core Four Readiness</a></div><div style="padding:12px"><a href="./id-evidence/">🧬 ID Evidence</a></div><div style="padding:12px"><a href="./fixture-lab/">🎯 Fixture Research Lab</a></div><div style="padding:12px"><a href="./identity-lab/">🧬 Team Identity Lab</a></div><div style="padding:12px"><a href="./live-fixtures/">📡 Fresh Fixtures</a></div><div style="padding:12px"><a href="./player-history/">⚽ Player History Lab</a></div><div style="padding:12px"><a href="./market-readiness/">🎯 Market Readiness</a></div><div style="padding:12px"><a href="./quality/">🔬 Data Quality Center</a> · <a href="./players/">👥 Player Directory</a> · <a href="./replay/">🎬 Replay Lab</a></div><div style="padding:12px"><a href="./players/">👥 Player Directory</a> · <a href="./replay/">🎬 2D Replay Lab</a></div><div style="padding:12px;display:flex;gap:15px;flex-wrap:wrap"><a href="./player-research/">📊 Player minutes evidence</a><a href="./replay/">🎬 2D replay prototype</a></div>
+<div class="kicker">THE CORE FOUR · ONE PLATFORM</div>
+<h1>Every match.<br>One simulation hub.</h1>
+<p class="muted">Explore preserved match models, the UCL historical
+archive, fixture schedules and experimental million-draw simulations.</p>
+<div class="notice">
+<b>Important:</b> This beta contains historical and experimental
+analyses—not certified live predictions. Schedule data is a saved
+snapshot, not a continuously refreshed feed. Unsupported probabilities
+remain unavailable.
+</div>
+<div id="metrics" class="metrics"></div>
+<nav id="tabs" class="tabs">
+<button data-tab="saved" class="active">Saved matches</button>
+<button data-tab="ucl">UCL archive</button>
+<button data-tab="schedule">Fixtures</button>
+<button data-tab="experimental">Simulation lab</button>
+<button data-tab="qa">Browser QA</button>
+</nav>
+<div id="filters" class="controls">
+<input id="query" placeholder="Search teams or leagues" aria-label="Search">
+<select id="league" aria-label="Filter competition"></select>
+</div>
+<p id="count" class="muted"></p>
+<section id="cards" class="cards"></section>
+<section id="detail" class="detail hidden">
+<button id="close">← Back to fixtures</button>
+<div class="kicker" id="detailType"></div>
+<h2 id="detailTitle"></h2>
+<p id="detailMeta" class="muted"></p>
+<div id="detailBody"></div>
+</section>
+<section id="qa" class="detail hidden">
+<h2>Actual browser tests</h2>
+<button id="runQA">Run browser checks</button>
+<p id="qaSummary"></p>
+<div id="qaResults"></div>
+</section>
+<footer>Sports Simulator Beta · Historical and experimental simulation analysis. No certified live predictions. <a href="./browser-qa/">Browser QA</a></footer>
+</main><script>
+const $=id=>document.getElementById(id);
+let D=null,tab='saved',query='',competition='',visible=[];
+const safe=x=>String(x??'');
+const pct=x=>(100*Number(x)).toFixed(2)+'%';
+const div=(cls,text)=>{
+ const e=document.createElement('div');
+ e.className=cls;e.textContent=safe(text);return e;
+};
+function metric(n,v){
+ const e=div('metric','');
+ const b=document.createElement('strong');
+ b.textContent=v;
+ e.append(b,document.createTextNode(n));
+ return e;
+}
+function rows(){
+ if(tab==='ucl')return D.ucl.map(x=>({
+  key:x.id,home:x.home,away:x.away,
+  league:'Champions League',date:x.kickoff,
+  status:'HISTORICAL',raw:x
+ }));
+ if(tab==='schedule')return D.schedule.map(x=>({
+  key:x.league_slug+':'+x.event_id,
+  home:x.home,away:x.away,
+  league:x.league||x.league_slug,date:x.date,
+  status:new Date(x.date).getTime()>Date.now()?
+   'UPCOMING · NO VERIFIED FORECAST':'SAVED SCHEDULE',
+  raw:x
+ }));
+ if(tab==='experimental')return D.experimental.map(x=>({
+  key:x.league_slug+':'+x.event_id,
+  home:x.home,away:x.away,league:x.league,date:x.kickoff,
+  status:new Date(x.kickoff).getTime()>Date.now()?
+   'EXPERIMENTAL · UPCOMING':'EXPERIMENTAL · HISTORICAL',
+  raw:x
+ }));
+ return D.saved.map(x=>({
+  key:x.id,home:x.home,away:x.away,league:x.league,date:x.date,
+  status:x.source?'SOURCE-REPORTED 1M':'UNAVAILABLE',
+  raw:x
+ }));
+}
+function render(){
+ $('detail').classList.add('hidden');
+ $('cards').classList.toggle('hidden',tab==='qa');
+ $('qa').classList.toggle('hidden',tab!=='qa');
+ $('filters').classList.toggle('hidden',tab==='qa');
+ document.querySelectorAll('[data-tab]').forEach(b=>
+  b.classList.toggle('active',b.dataset.tab===tab));
+ if(tab==='qa'){
+  $('count').textContent='Browser-native QA';
+  return;
+ }
+ const all=rows();
+ const leagues=[...new Set(all.map(x=>safe(x.league)))].sort();
+ if(!leagues.includes(competition))competition='';
+ $('league').replaceChildren();
+ const allOption=document.createElement('option');
+ allOption.value='';allOption.textContent='All competitions';
+ $('league').append(allOption);
+ leagues.forEach((v,i)=>{
+  const o=document.createElement('option');
+  o.value=String(i);o.textContent=v;
+  $('league').append(o);
+ });
+ $('league').value=competition?
+  String(leagues.indexOf(competition)):'';
+ visible=all.filter(x=>
+  (!competition||safe(x.league)===competition)&&
+  [x.home,x.away,x.league,x.date].join(' ')
+   .toLowerCase().includes(query));
+ $('count').textContent=visible.length+' / '+all.length+' entries';
+ $('cards').replaceChildren();
+ visible.forEach(x=>{
+  const c=div('card','');
+  const tag=div('tag',x.status);
+  const h=document.createElement('h3');
+  h.textContent=safe(x.home)+' vs '+safe(x.away);
+  const m=div('muted',safe(x.league)+' · '+safe(x.date));
+  const b=document.createElement('button');
+  b.textContent='View match';
+  b.addEventListener('click',()=>detail(x));
+  c.append(tag,h,m,b);$('cards').append(c);
+ });
+ if(!visible.length)$('cards').append(div('muted',
+  'No records match your search.'));
+}
+function graph(label,value){
+ const p=Number(value);
+ if(!Number.isFinite(p)||p<0||p>1)return;
+ const e=div('graph','');
+ const heading=div('glabel','');
+ const left=document.createElement('span');
+ left.textContent=label;
+ const right=document.createElement('b');
+ right.textContent=pct(p);
+ heading.append(left,right);
+ const track=div('track','');
+ const fill=div('fill','');
+ fill.style.width=Math.max(0,Math.min(100,p*100))+'%';
+ track.append(fill);e.append(heading,track);
+ $('detailBody').append(e);
+}
+function detail(x){
+ $('cards').classList.add('hidden');
+ $('qa').classList.add('hidden');
+ $('detail').classList.remove('hidden');
+ $('detailType').textContent=x.status;
+ $('detailTitle').textContent=safe(x.home)+' vs '+safe(x.away);
+ $('detailMeta').textContent=safe(x.league)+' · '+safe(x.date);
+ $('detailBody').replaceChildren();
+ const v=x.raw;
+ if(tab==='saved'){
+  if(v.source){
+   const p=v.source.one_x_two_pct;
+   ['Home win','Draw','Away win'].forEach((label,i)=>
+    graph(label,Number(p[i])/100));
+   $('detailBody').append(div('muted',
+    'Reported draws: '+v.source.reported_draws+
+    ' · Algorithm not independently certified'));
+  }else $('detailBody').append(div('muted',
+   'No qualifying source record. Probabilities unavailable.'));
+ }else if(tab==='ucl'){
+  v.rows.forEach(m=>{
+   const box=div('secondary',
+    m.market+' · reported draws: '+(m.draw_count??'unknown')+
+    ' · '+(m.row_qa_pass?'internal QA pass':'review required'));
+   $('detailBody').append(box);
+   if(m.one_x_two_pct&&m.row_qa_pass)
+    ['Home win','Draw','Away win'].forEach((label,i)=>
+      graph(label,Number(m.one_x_two_pct[i])/100));
+  });
+ }else if(tab==='experimental'){
+  const m=v.markets;
+  [['Home win','home_win'],['Draw','draw'],
+   ['Away win','away_win'],['BTTS','btts_yes'],
+   ['Over 2.5','over_2_5']].forEach(([label,key])=>graph(label,m[key]));
+  $('detailBody').append(div('muted',
+   v.simulation_count.toLocaleString()+
+   ' seeded draws · Experimental, not calibrated'));
+  $('detailBody').append(div('muted',
+   'Top scores: '+v.top_scores.map(s=>
+    s.score+' '+pct(s.probability)).join(' · ')));
+ }else{
+  $('detailBody').append(div('muted',
+   'Provider event ID: '+safe(v.event_id)+
+   '. No current verified forecast is attached.'));
+ }
+}
+function qa(){
+ const t=[];
+ const test=(name,fn)=>{
+  try{t.push({name,pass:!!fn()})}
+  catch(e){t.push({name,pass:false,error:String(e)})}
+ };
+ test('290 saved matches',()=>D.saved.length===290);
+ test('289 source-linked matches',()=>
+  D.saved.filter(x=>x.source).length===289);
+ test('18 UCL archives',()=>D.ucl.length===18);
+ test('48 internally passing UCL rows',()=>
+  D.ucl.flatMap(x=>x.rows).length===48&&
+  D.ucl.every(x=>x.rows.every(r=>r.row_qa_pass)));
+ test('55 schedule entries',()=>D.schedule.length===55);
+ test('7 experimental fixtures',()=>D.experimental.length===7);
+ test('7M recorded experimental draws',()=>
+  D.experimental.reduce((s,x)=>s+x.simulation_count,0)===7000000);
+ test('Experimental 1X2 sum',()=>
+  D.experimental.every(x=>Math.abs(x.markets.home_win+
+   x.markets.draw+x.markets.away_win-1)<0.000001));
+ test('Search filters actual cards',()=>{
+  const oldTab=tab,oldQuery=query,oldComp=competition;
+  tab='saved';query='__NO_MATCH_3058__';competition='';render();
+  const a=$('cards').querySelectorAll('.card').length===0;
+  query='';render();
+  const b=$('cards').querySelectorAll('.card').length===290;
+  tab=oldTab;query=oldQuery;competition=oldComp;render();
+  return a&&b;
+ });
+ test('Detail interaction updates DOM',()=>{
+  const oldTab=tab;
+  tab='saved';detail(rows()[37]);
+  const okay=$('detailTitle').textContent===
+   D.saved[37].home+' vs '+D.saved[37].away;
+  tab=oldTab;render();return okay;
+ });
+ $('qaSummary').textContent=
+  t.filter(x=>x.pass).length+' / '+t.length+' checks passed';
+ $('qaResults').replaceChildren();
+ t.forEach(x=>$('qaResults').append(div(
+  x.pass?'checkpass':'checkfail',
+  (x.pass?'PASS · ':'FAIL · ')+x.name+
+  (x.error?' · '+x.error:'')
+ )));
+}
+document.querySelectorAll('[data-tab]').forEach(b=>
+ b.addEventListener('click',()=>{
+  tab=b.dataset.tab;query='';competition='';
+  $('query').value='';render();
+  if(tab==='qa')qa();
+ }));
+$('query').addEventListener('input',()=>{
+ query=$('query').value.toLowerCase();render();
+});
+$('league').addEventListener('change',()=>{
+ const leagues=[...new Set(rows().map(x=>safe(x.league)))].sort();
+ competition=$('league').value===''?'':leagues[
+   Number($('league').value)];
+ render();
+});
+$('close').onclick=render;
+$('runQA').onclick=qa;
+fetch('./data.json').then(r=>{
+ if(!r.ok)throw Error('Data HTTP '+r.status);
+ return r.json();
+}).then(d=>{
+ D=d;
+ $('built').textContent='Snapshot '+d.generated_utc.slice(0,16)+' UTC';
+ const s=d.numbers;
+ [
+ ['Original draws','657M'],
+ ['Experimental draws','7M'],
+ ['Saved matches',s.saved_count],
+ ['UCL archives',s.ucl_count],
+ ['Clubs',98],
+ ['Schedule entries',s.schedule_count]
+ ].forEach(x=>$('metrics').append(metric(...x)));
+ render();
+}).catch(e=>{
+ $('count').textContent='Could not load beta data: '+e.message;
+});
+</script></body></html>

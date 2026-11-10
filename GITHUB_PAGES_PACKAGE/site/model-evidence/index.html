@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | Model Evidence</title>
+<style>
+body{background:#292b29;color:#fafaf5;font:15px system-ui;margin:0}
+main{max-width:940px;margin:auto;padding:23px}
+h1{color:#baff70}a{color:#8de9ed}
+.panel{background:#393e38;border-radius:10px;margin:10px 0;padding:13px}
+</style>
+<main>
+<a href="../">← Sports Simulator</a>
+<h1>🏆 Multi-source Model Evidence</h1>
+<p>Historical chronological tests only. Name-based fixture coverage is
+not a verified provider-ID join. No live forecasts or player props certified.</p>
+<div id="metrics"></div>
+</main>
+<script>
+fetch('./data.json')
+.then(r=>{if(!r.ok)throw Error(r.status);return r.json()})
+.then(d=>{
+ const root=document.getElementById('metrics');
+ const metrics={
+  'Merged matches':d.merged_history_rows,
+  'Source conflicts':d.conflict_total,
+  'Chronological test fixtures':d.backtest_evaluated,
+  'Research model Brier':d.model_brier===null?'Unavailable':d.model_brier.toFixed(5),
+  'Baseline Brier':d.baseline_brier===null?'Unavailable':d.baseline_brier.toFixed(5),
+  'Model beats baseline':d.model_beats_baseline?'YES':'NO / NOT ESTABLISHED',
+  'Fixture candidates (union)':d.candidate_union,
+  'Certified live forecasts':d.certified_live_forecasts
+ };
+ for(const [k,v] of Object.entries(metrics)){
+  let p=document.createElement('div');
+  p.className='panel';p.textContent=k+': '+v;root.append(p);
+ }
+})
+.catch(e=>document.getElementById('metrics').textContent=e.message);
+</script></html>

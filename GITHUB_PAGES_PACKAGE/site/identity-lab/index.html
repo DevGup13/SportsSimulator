@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | Team Identity Lab</title>
+<style>
+body{background:#292b29;color:#f7f7f2;margin:0;font:15px system-ui}
+main{max-width:1000px;margin:auto;padding:22px}
+h1{color:#baff70}a{color:#86eaf2}
+input{background:#373b36;border:1px solid #777;color:white;
+border-radius:8px;padding:12px}
+.card{background:#373d36;border:1px solid #596253;
+border-radius:10px;padding:13px;margin:8px 0}
+small{color:#cdd1ca}
+</style>
+<main>
+<a href="../">← Beta</a>
+<h1>🧬 Team Identity Lab</h1>
+<p>Exact-name matches are review candidates ONLY.
+No historical team-ID joins or forecasts are certified.</p>
+<input id="query" placeholder="Search team or league">
+<p id="summary"></p>
+<section id="cards"></section>
+<script>
+const $=x=>document.getElementById(x);
+let teams=[];
+function render(){
+ const q=$('query').value.toLowerCase();
+ const v=teams.filter(x=>
+  (x.names.join(' ')+x.league_slug+x.history_names.join(' '))
+  .toLowerCase().includes(q)
+ );
+ $('summary').textContent=v.length+' / '+teams.length+' source-ID teams';
+ $('cards').replaceChildren();
+ for(const x of v.slice(0,140)){
+  const c=document.createElement('div');c.className='card';
+  const h=document.createElement('strong');
+  h.textContent=x.names.join(' / ')+' · '+x.league_slug;
+  const p=document.createElement('p');
+  p.textContent='ESPN ID '+x.provider_team_id+' · '+x.status;
+  const note=document.createElement('small');
+  note.textContent='History: '+(x.history_names.join(' / ')||'none')+
+   ' · '+x.history_rows+' appearances';
+  c.append(h,p,note);
+  $('cards').append(c);
+ }
+}
+$('query').oninput=render;
+fetch('./data.json')
+ .then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()})
+ .then(d=>{teams=d.teams;render()})
+ .catch(e=>$('summary').textContent=e.message);
+</script>
+</main></html>

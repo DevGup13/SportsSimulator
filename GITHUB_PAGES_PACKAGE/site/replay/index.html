@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | Match Replay Lab</title>
+<style>
+:root{color-scheme:dark}
+body{font:15px system-ui;margin:0;background:#292b29;color:#fafaf5}
+main{max-width:900px;margin:auto;padding:23px}
+a{color:#90ebef}h1{color:#baff70}
+.panel{background:#383b37;padding:15px;border-radius:12px;margin:14px 0}
+select,button{background:#baff70;color:#172016;border:0;border-radius:8px;
+padding:10px;font:inherit}
+svg{width:100%;max-height:460px;background:#276044;border-radius:12px}
+.warn{border-left:3px solid #baff70;padding:12px;background:#384338}
+small{color:#cad0c5}
+</style>
+<main>
+<a href="../">← Sports Simulator beta</a>
+<h1>⚽ 2D Match Replay Lab</h1>
+<div class="warn">
+VISUAL PROTOTYPE — Animated movement is illustrative.
+It is NOT a replay of a specific million-draw outcome or source event
+timeline. Player positions and goals are not inferred.
+</div>
+<div class="panel">
+<label>Saved experimental match <select id="match"></select></label>
+<button id="toggle">Pause animation</button>
+<p id="meta"></p>
+</div>
+<svg viewBox="0 0 800 480" aria-label="Illustrative football pitch"
+role="img">
+<rect x="20" y="20" width="760" height="440" fill="#337b58"
+stroke="#fff" stroke-width="2"/>
+<path d="M400 20V460M20 140H120V340H20M780 140H680V340H780"
+stroke="#fff" stroke-width="2" fill="none"/>
+<circle cx="400" cy="240" r="67" stroke="#fff"
+stroke-width="2" fill="none"/>
+<g id="players"></g>
+<circle id="ball" cx="400" cy="240" r="7" fill="#fff"
+stroke="#151515" stroke-width="2"/>
+</svg>
+<p><small>Verified event-by-event replay requires joint simulation
+events, timing, and player identity evidence.</small></p>
+</main>
+<script>
+const $=s=>document.getElementById(s);
+let games=[],tick=0,playing=true;
+const ns='http://www.w3.org/2000/svg';
+const players=$('players');
+for(let j=0;j<22;j++){
+ let c=document.createElementNS(ns,'circle');
+ c.setAttribute('r',j===0||j===11?11:9);
+ c.setAttribute('fill',j<11?'#7fe9ff':'#ffe09d');
+ c.setAttribute('stroke','#1b2420');
+ c.setAttribute('stroke-width','2');
+ players.appendChild(c);
+}
+function draw(){
+ let dots=players.children;
+ for(let j=0;j<22;j++){
+  let side=j<11?0:1,idx=j%11;
+  let x=(side?530:270)+(idx%4-1.5)*46+12*Math.sin(tick/16+j);
+  let y=87+Math.floor(idx/4)*144+12*Math.cos(tick/20+j);
+  dots[j].setAttribute('cx',x);
+  dots[j].setAttribute('cy',y);
+ }
+ $('ball').setAttribute('cx',400+125*Math.sin(tick/27));
+ $('ball').setAttribute('cy',240+78*Math.sin(tick/43));
+}
+function loop(){
+ if(playing){tick++;draw()}
+ requestAnimationFrame(loop);
+}
+$('toggle').onclick=()=>{
+ playing=!playing;
+ $('toggle').textContent=playing?'Pause animation':'Play animation';
+};
+$('match').onchange=()=>{
+ let x=games[Number($('match').value)];
+ $('meta').textContent=x?
+  x.league+' · '+x.simulations.toLocaleString()+
+  ' saved experimental draws · probabilities not independently certified':'';
+};
+fetch('../replay-data.json')
+ .then(r=>{if(!r.ok)throw Error('Missing data');return r.json()})
+ .then(d=>{
+  games=d.matches;
+  games.forEach((x,i)=>{
+   let o=document.createElement('option');
+   o.value=i;o.textContent=x.home+' vs '+x.away;
+   $('match').appendChild(o);
+  });
+  $('match').onchange();
+  draw();
+  requestAnimationFrame(loop);
+ })
+ .catch(e=>$('meta').textContent=e.message);
+</script>
+</html>

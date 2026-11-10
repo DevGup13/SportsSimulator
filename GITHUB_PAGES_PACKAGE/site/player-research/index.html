@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sports Simulator | Player Evidence</title>
+<style>
+:root{color-scheme:dark}
+body{background:#292b29;color:#fafaf5;font:16px system-ui;margin:0}
+main{max-width:830px;margin:auto;padding:28px}
+a{color:#90ebef}
+.box{background:#383b37;padding:18px;border-radius:12px}
+strong{color:#baff70}
+</style>
+<main>
+<a href="../">← Sports Simulator beta</a>
+<h1>📊 Player Playing-Time Research</h1>
+<div class="box" id="result">Loading source statistics...</div>
+<p>Player props remain unavailable until player-minute histories,
+each prop's source, and the simulation model are validated.</p>
+</main>
+<script>
+fetch('../research.json').then(r=>r.json()).then(d=>
+ document.getElementById('result').textContent=
+ d.explicit_minutes_count+' / '+d.total_player_logs+
+ ' rows have explicit valid minutes tied to player and match IDs. Fields: '+
+ JSON.stringify(d.minute_source_fields)+
+ '. Player props: UNAVAILABLE.'
+).catch(e=>
+ document.getElementById('result').textContent=
+ 'Unavailable: '+e.message
+);
+</script>
+</html>

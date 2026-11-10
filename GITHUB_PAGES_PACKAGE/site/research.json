@@ -1,0 +1,17 @@
+{
+  "version": "V30.62",
+  "total_player_logs": 16399,
+  "explicit_minutes_count": 0,
+  "minute_source_fields": {},
+  "minute_rejection_reasons": {
+    "NO_EXPLICIT_MINUTES": 16399
+  },
+  "unique_player_match_pairs": 0,
+  "player_props_available": false,
+  "replay_verified_from_event_draws": false,
+  "draws_original": 657000000,
+  "draws_experimental": 7000000,
+  "experiment_count": 7,
+  "minute_field_paths_discovered": {},
+  "minutes_schema_reinspection_complete": true
+}
